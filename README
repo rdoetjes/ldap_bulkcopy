@@ -1,0 +1,81 @@
+FUNCTIONALITY
+
+This scripts will find objects in the target directory that matched the source's --sIdentifiers.
+When this match is found the source attributes in --sAttributes are create (or overriden when --replace is used)
+on the found target object.
+
+Use case example:
+You need to copy the email addresses and descritpion in your HR objects on the Azure directory, where they are missing. 
+And the mail in local directory is mapped to emailAddress in Azure
+And the description in local directory is mapped to description in Azure
+In this use case we can uniquely identify a user in HR directory with the uid which for example is matched in Azure to userId.
+
+You would start the script as follows:
+
+./ldap-bulkcopy.py  --sLdap="ldap://127.0.0.1/" \
+          --sBind="cn=admin,dc=phonax" \
+          --sPass="Phonax01" \
+          --sBaseDN="ou=source,ou=users,dc=phonax" \
+          --sAttribs="mail, description" \
+          --sIdentifiers="(uid=[uid])(gidNumber=[gidNumber])" \
+          --sFilter="(&(objectClass=posixAccount)(cn=*))" \
+          --dLdap=ldap://127.0.0.1 \
+          --dBind="cn=admin,dc=phonax" \
+          --dPass="Phonax01" \
+          --dBaseDN="ou=dest,ou=users,dc=azure" \
+          --dAttribs="emailAddress, description" \
+          --dFilter="(&(objectClass=user)[sIdentifiers])" 
+
+
+STARTING THE SCRIPT
+
+ldap_enrich takes certain specified attributes from one object and copies them to another objects
+
+Usage: ldap-bulkcopy.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --sLdap=SOURCE        LDAP url of source
+  --sBind=SOURCEBIND    source bind
+  --sPass=SOURCEPASS    source password
+  --sBaseDN=SBASEDN     source password
+  --sAttribs=SATTRIBS   comma seperated attributes to copy (this list matched 1 to 1 in order with the --dAttribs)
+  --sFilter=SFILTER     source filter which objects to select
+  --dLdap=DEST          LDAP url of destination
+  --dBind=DESTBIND      dest bind
+  --dPass=DESTPASS      dest password
+  --dBaseDN=DBASEDN     source password
+  --dFilter=DFILTER     destination filter that should contain [sIdentifiers] tag to uniquely find matching
+                        object in destination directory. F.i: (&(objectClass=user)[sIdentifiers])
+                        Where [sIdentifiers] will be replaced with evaluated --sIdentifiers
+  --dAttribs=DATTRIBS   comma seperated attributes to be copied (matching 1 to
+                        1 with sAttrib)
+  --sIdentifiers=SIDENTIFIERS
+                        LDAP search string template to uniquely identify a user in 
+                        destination directory; f.i. (uid=[uid])(groupNumber=[gidNumber] 
+                        where [uid] and [gidNumber] are replace with the source's attribute values
+                        is changed with source value
+  -r, --replace         replace destination attributes when they differ
+                        between source and dest, default is false
+  -t, --simulate        Only print output the unencoded LDIF output, for
+                        inspection and will not update the directory
+
+
+ATTRIBUTE ONE TO ONE MAPPING
+
+The source attribute list matches one to one the destination attribute list.
+This allows you to copy a source attribute value to a destination attribute with a different name.
+
+For example:
+-sAttribs='loginShell, uid'
+-dAttribs='loginShell, description'
+Would copy the source value in loginShell to the attribute loginShell in the destination,
+And copies the uid value from the source object to the destimation object's description field.
+NOTE: THEREFORE THERE ARE ALWAYS THE SAME AMOUNT OF ATTRIBUTES IN THE SOURCE AND DESTINATION
+
+
+DEPENDENCIES TO INSTALL 
+
+sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+sudo pip install python-ldap
+

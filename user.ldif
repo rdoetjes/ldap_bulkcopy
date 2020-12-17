@@ -1,0 +1,12 @@
+dn: cn=user3,ou=source,ou=users,dc=phonax
+objectClass: organizationalUnit
+objectClass: posixAccount
+objectClass: top
+cn: user3
+gidNumber: 3
+homeDirectory: /home/user3
+ou: ou=source,ou=users,dc=phonax
+uid: 3
+uidNumber: 3
+userPassword:: UGhvbmF4MDE=
+
