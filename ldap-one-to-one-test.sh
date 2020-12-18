@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-./ldap-bulkcopy.py  --sLdap="ldap://127.0.0.1/" \
+./ldap-one-to-one.py --sLdap="ldap://127.0.0.1/" \
 		--sBind="cn=admin,dc=phonax" \
 		--sPass="Phonax01" \
         --sBaseDN="ou=source,ou=users,dc=phonax" \
